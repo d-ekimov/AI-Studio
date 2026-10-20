@@ -136,4 +136,92 @@
   $("#profileButton").addEventListener("click",()=>toast("Профиль пока локальный — авторизацию добавим позже."));
   document.addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();newChat();}});
   renderHistory();renderChat();renderProjects();renderTasks();
-})();
+  // Настройки провайдеров: ключи намеренно не сохраняются.
+  const providerIds = [
+    "openai",
+    "deepseek",
+    "gemini",
+    "flux",
+    "runway",
+    "elevenlabs"
+  ];
+
+  providerIds.forEach(id => {
+    const modelSelect = document.getElementById("model-" + id);
+    const savedModel = read("aistudio_model_" + id, "");
+
+    if (modelSelect && savedModel &&
+        [...modelSelect.options].some(option => option.value === savedModel)) {
+      modelSelect.value = savedModel;
+    }
+
+    modelSelect?.addEventListener("change", () => {
+      save("aistudio_model_" + id, modelSelect.value);
+      toast("Выбор модели сохранён. Реальный API ещё не подключён.");
+    });
+  });
+
+  document.querySelectorAll(".toggle-key").forEach(button => {
+    button.addEventListener("click", () => {
+      const input = document.getElementById(button.dataset.target);
+      if (!input) return;
+
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      button.textContent = show ? "Скрыть" : "Показать";
+    });
+  });
+
+  document.querySelectorAll(".save-provider").forEach(button => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.provider;
+      const input = document.getElementById("key-" + id);
+      const status = document.getElementById("status-" + id);
+      const model = document.getElementById("model-" + id);
+
+      // Сохраняем только выбор модели, не секретный ключ.
+      if (model) save("aistudio_model_" + id, model.value);
+
+      if (input && input.value.trim()) {
+        input.value = "";
+        input.type = "password";
+
+        const toggle = document.querySelector(
+          '.toggle-key[data-target="key-' + id + '"]'
+        );
+        if (toggle) toggle.textContent = "Показать";
+      }
+
+      if (status) {
+        status.textContent = "Нужен сервер";
+        status.classList.add("planned");
+      }
+
+      toast("Выбор сохранён. Ключ не сохранён: подключение добавим через сервер.");
+    });
+  });
+
+  document.querySelectorAll(".disconnect-provider").forEach(button => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.provider;
+      const input = document.getElementById("key-" + id);
+      const status = document.getElementById("status-" + id);
+
+      if (input) {
+        input.value = "";
+        input.type = "password";
+      }
+
+      const toggle = document.querySelector(
+        '.toggle-key[data-target="key-' + id + '"]'
+      );
+      if (toggle) toggle.textContent = "Показать";
+
+      if (status) {
+        status.textContent = "Не настроено";
+        status.classList.remove("planned");
+      }
+
+      toast("Поле очищено.");
+    });
+  });})();
