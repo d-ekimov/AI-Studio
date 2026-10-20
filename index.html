@@ -6,6 +6,9 @@
   <meta name="theme-color" content="#0c0d12" />
   <title>AI Studio — единое пространство для ИИ</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#0c0d12" />
 </head>
 <body>
   <div class="app-shell">
@@ -13,6 +16,13 @@
       <div class="brand"><div class="brand-mark">✳</div><div><strong>AI Studio</strong><small>Твоё пространство ИИ</small></div></div>
       <button class="new-chat" id="newChat"><span>＋</span> Новый чат <kbd>⌘ K</kbd></button>
       <nav class="main-nav" aria-label="Главная навигация">
+        <button class="nav-item" data-page="models">
+  <span>⚙</span> API и подключения
+</button>
+
+<button class="nav-item" id="installAppButton">
+  <span>↓</span> Установить на телефон
+</button>
         <button class="nav-item active" data-page="chat"><span>◉</span> Чат</button>
         <button class="nav-item" data-page="compare"><span>◫</span> Несколько ИИ <span class="nav-tag">NEW</span></button>
         <button class="nav-item" data-page="projects"><span>▦</span> Проекты</button>
@@ -70,20 +80,188 @@
         </div>
       </section>
 
-      <section class="page" id="page-tasks">
-        <div class="page-header page-header-row"><div><div class="eyebrow">ПЛАНИРУЙ И ДЕЛАЙ</div><h1>Мои <span>задачи.</span></h1><p>Отмечай выполненное и держи фокус на главном.</p></div><button class="primary-btn" id="addTask">＋ Новая задача</button></div>
-        <div class="task-stats"><div><small>ВСЕГО</small><strong id="taskTotal">4</strong></div><div><small>В РАБОТЕ</small><strong id="taskActive">3</strong></div><div><small>ГОТОВО</small><strong id="taskDone">1</strong></div><div class="progress-stat"><div class="progress-label"><small>ОБЩИЙ ПРОГРЕСС</small><strong id="taskProgress">25%</strong></div><div class="progress-track"><i id="taskProgressBar"></i></div></div></div>
-        <div class="task-toolbar"><strong>Все задачи</strong><select id="taskFilter"><option value="all">Все статусы</option><option value="active">В работе</option><option value="done">Выполнено</option></select></div>
-        <div class="task-list" id="taskList"></div>
-      </section>
+      <section class="page" id="page-tasks"><div class="provider-list" id="providerList">
 
-      <section class="page" id="page-models">
-        <div class="page-header"><div class="eyebrow">ЕДИНОЕ ПОДКЛЮЧЕНИЕ</div><h1>Модели <span>и провайдеры.</span></h1><p>Подготовим пространство для разных ИИ. Подключение ключей сделаем отдельным этапом.</p></div>
-        <div class="provider-list">
-          <article class="provider-card"><div class="provider-icon openai">✳</div><div class="provider-main"><div class="provider-title"><h3>OpenAI / ChatGPT</h3><span class="state-label">Не подключено</span></div><p>Чат, генерация идей, помощь с кодом и текстами.</p><small>Подключение через API · ключ хранится на сервере</small></div><button class="outline-btn provider-detail" data-provider="OpenAI / ChatGPT">Подробнее</button></article>
-          <article class="provider-card"><div class="provider-icon deepseek">◈</div><div class="provider-main"><div class="provider-title"><h3>DeepSeek</h3><span class="state-label">Не подключено</span></div><p>Альтернативная модель для рассуждений и программирования.</p><small>Подключение через API · ключ хранится на сервере</small></div><button class="outline-btn provider-detail" data-provider="DeepSeek">Подробнее</button></article>
-          <article class="provider-card"><div class="provider-icon future-icon">✧</div><div class="provider-main"><div class="provider-title"><h3>Другие модели</h3><span class="state-label planned">В планах</span></div><p>Добавим новых провайдеров через отдельные адаптеры, не ломая интерфейс.</p><small>Архитектура расширяется по мере необходимости</small></div><button class="outline-btn" id="futureProvider">В планах</button></article>
+  <article class="provider-card api-card" data-provider="openai">
+    <div class="provider-icon openai">✳</div>
+    <div class="provider-main">
+      <div class="provider-title">
+        <h3>OpenAI / ChatGPT</h3>
+        <span class="state-label" id="status-openai">Не настроено</span>
+      </div>
+      <p>Универсальный ИИ для чата, кода, текстов и анализа.</p>
+      <small>API OpenAI · текстовые модели</small>
+      <div class="api-controls">
+        <label for="model-openai">Модель</label>
+        <select id="model-openai">
+          <option value="gpt-4.1-mini">GPT-4.1 mini</option>
+          <option value="gpt-4.1">GPT-4.1</option>
+          <option value="gpt-4o">GPT-4o</option>
+        </select>
+        <label for="key-openai">API-ключ</label>
+        <div class="key-row">
+          <input id="key-openai" type="password" placeholder="Вставь ключ позже" autocomplete="off">
+          <button type="button" class="outline-btn toggle-key" data-target="key-openai">Показать</button>
         </div>
+      </div>
+    </div>
+    <div class="api-actions">
+      <button type="button" class="primary-btn save-provider" data-provider="openai">Готово</button>
+      <button type="button" class="outline-btn disconnect-provider" data-provider="openai">Очистить</button>
+    </div>
+  </article>
+
+  <article class="provider-card api-card" data-provider="deepseek">
+    <div class="provider-icon deepseek">◈</div>
+    <div class="provider-main">
+      <div class="provider-title">
+        <h3>DeepSeek</h3>
+        <span class="state-label" id="status-deepseek">Не настроено</span>
+      </div>
+      <p>Рассуждения, программирование и работа с логикой.</p>
+      <small>DeepSeek API · текстовые модели</small>
+      <div class="api-controls">
+        <label for="model-deepseek">Модель</label>
+        <select id="model-deepseek">
+          <option value="deepseek-chat">DeepSeek Chat</option>
+          <option value="deepseek-reasoner">DeepSeek Reasoner</option>
+        </select>
+        <label for="key-deepseek">API-ключ</label>
+        <div class="key-row">
+          <input id="key-deepseek" type="password" placeholder="Вставь ключ позже" autocomplete="off">
+          <button type="button" class="outline-btn toggle-key" data-target="key-deepseek">Показать</button>
+        </div>
+      </div>
+    </div>
+    <div class="api-actions">
+      <button type="button" class="primary-btn save-provider" data-provider="deepseek">Готово</button>
+      <button type="button" class="outline-btn disconnect-provider" data-provider="deepseek">Очистить</button>
+    </div>
+  </article>
+
+  <article class="provider-card api-card" data-provider="gemini">
+    <div class="provider-icon future-icon">✦</div>
+    <div class="provider-main">
+      <div class="provider-title">
+        <h3>Google Gemini</h3>
+        <span class="state-label" id="status-gemini">Не настроено</span>
+      </div>
+      <p>Работа с текстом, изображениями и мультимодальными задачами.</p>
+      <small>Google AI API · модели Gemini</small>
+      <div class="api-controls">
+        <label for="model-gemini">Модель</label>
+        <select id="model-gemini">
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+        </select>
+        <label for="key-gemini">API-ключ</label>
+        <div class="key-row">
+          <input id="key-gemini" type="password" placeholder="Вставь ключ позже" autocomplete="off">
+          <button type="button" class="outline-btn toggle-key" data-target="key-gemini">Показать</button>
+        </div>
+      </div>
+    </div>
+    <div class="api-actions">
+      <button type="button" class="primary-btn save-provider" data-provider="gemini">Готово</button>
+      <button type="button" class="outline-btn disconnect-provider" data-provider="gemini">Очистить</button>
+    </div>
+  </article>
+
+  <article class="provider-card api-card" data-provider="flux">
+    <div class="provider-icon future-icon">▧</div>
+    <div class="provider-main">
+      <div class="provider-title">
+        <h3>FLUX</h3>
+        <span class="state-label" id="status-flux">Не настроено</span>
+      </div>
+      <p>Генерация изображений по текстовому описанию.</p>
+      <small>Через API-провайдера, например fal.ai</small>
+      <div class="api-controls">
+        <label for="model-flux">Модель</label>
+        <select id="model-flux">
+          <option value="flux-schnell">FLUX Schnell</option>
+          <option value="flux-dev">FLUX Dev</option>
+          <option value="flux-pro">FLUX Pro</option>
+        </select>
+        <label for="key-flux">API-ключ</label>
+        <div class="key-row">
+          <input id="key-flux" type="password" placeholder="Вставь ключ позже" autocomplete="off">
+          <button type="button" class="outline-btn toggle-key" data-target="key-flux">Показать</button>
+        </div>
+      </div>
+    </div>
+    <div class="api-actions">
+      <button type="button" class="primary-btn save-provider" data-provider="flux">Готово</button>
+      <button type="button" class="outline-btn disconnect-provider" data-provider="flux">Очистить</button>
+    </div>
+  </article>
+
+  <article class="provider-card api-card" data-provider="runway">
+    <div class="provider-icon future-icon">▶</div>
+    <div class="provider-main">
+      <div class="provider-title">
+        <h3>Runway</h3>
+        <span class="state-label" id="status-runway">Не настроено</span>
+      </div>
+      <p>Создание видео и анимация визуальных идей.</p>
+      <small>Runway API · генерация видео</small>
+      <div class="api-controls">
+        <label for="model-runway">Модель</label>
+        <select id="model-runway">
+          <option value="gen4.5">Gen-4.5</option>
+          <option value="gen4_turbo">Gen-4 Turbo</option>
+        </select>
+        <label for="key-runway">API-ключ</label>
+        <div class="key-row">
+          <input id="key-runway" type="password" placeholder="Вставь ключ позже" autocomplete="off">
+          <button type="button" class="outline-btn toggle-key" data-target="key-runway">Показать</button>
+        </div>
+      </div>
+    </div>
+    <div class="api-actions">
+      <button type="button" class="primary-btn save-provider" data-provider="runway">Готово</button>
+      <button type="button" class="outline-btn disconnect-provider" data-provider="runway">Очистить</button>
+    </div>
+  </article>
+
+  <article class="provider-card api-card" data-provider="elevenlabs">
+    <div class="provider-icon future-icon">♫</div>
+    <div class="provider-main">
+      <div class="provider-title">
+        <h3>ElevenLabs</h3>
+        <span class="state-label" id="status-elevenlabs">Не настроено</span>
+      </div>
+      <p>Озвучка текста, синтез речи и голосовые инструменты.</p>
+      <small>ElevenLabs API · аудио и голос</small>
+      <div class="api-controls">
+        <label for="model-elevenlabs">Модель</label>
+        <select id="model-elevenlabs">
+          <option value="eleven_multilingual_v2">Multilingual v2</option>
+          <option value="eleven_turbo_v2_5">Turbo v2.5</option>
+        </select>
+        <label for="key-elevenlabs">API-ключ</label>
+        <div class="key-row">
+          <input id="key-elevenlabs" type="password" placeholder="Вставь ключ позже" autocomplete="off">
+          <button type="button" class="outline-btn toggle-key" data-target="key-elevenlabs">Показать</button>
+        </div>
+      </div>
+    </div>
+    <div class="api-actions">
+      <button type="button" class="primary-btn save-provider" data-provider="elevenlabs">Готово</button>
+      <button type="button" class="outline-btn disconnect-provider" data-provider="elevenlabs">Очистить</button>
+    </div>
+  </article>
+
+</div>
+
+<div class="security-note">
+  <span>♧</span>
+  <div>
+    <strong>Безопасность прежде всего</strong>
+    <p>Пока это только интерфейс настройки. Ключи не сохраняются и не проверяются: для настоящего подключения нужен сервер. Не вводи реальные ключи в эту версию.</p>
+  </div>
+</div>
+       </div>
         <div class="security-note"><span>♧</span><div><strong>Безопасность прежде всего</strong><p>Не вставляй секретные API-ключи в этот прототип и не публикуй их в GitHub. Для реального подключения понадобится серверная часть.</p></div></div>
         <div class="settings-card"><div><h3>Настройки интерфейса</h3><p>Выбери удобный вид рабочего пространства.</p></div><label class="setting-row"><span><strong>Компактный режим</strong><small>Меньше отступов в списках и карточках</small></span><input type="checkbox" id="compactToggle"></label><label class="setting-row"><span><strong>Подтверждать очистку истории</strong><small>Показывать подтверждение перед удалением</small></span><input type="checkbox" id="confirmClear" checked></label></div>
       </section>
