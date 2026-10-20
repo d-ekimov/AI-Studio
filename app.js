@@ -224,4 +224,39 @@
 
       toast("Поле очищено.");
     });
-  });})();
+  });
+  // Установка AI Studio как приложения.
+  let installPrompt = null;
+  const installButton = document.getElementById("installAppButton");
+
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    installPrompt = event;
+
+    if (installButton) {
+      installButton.textContent = "↓ Установить приложение";
+    }
+  });
+
+  installButton?.addEventListener("click", async () => {
+    if (installPrompt) {
+      installPrompt.prompt();
+      await installPrompt.userChoice;
+      installPrompt = null;
+      return;
+    }
+
+    openDialog(
+      "Установить AI Studio",
+      "На Android открой сайт в Chrome, нажми меню ⋮ и выбери «Установить приложение» или «Добавить на главный экран». Название пункта зависит от браузера.",
+      "Понятно",
+      () => {}
+    );
+  });
+
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js")
+        .catch(error => console.error("Service Worker:", error));
+    });
+  }})();
